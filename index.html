@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mind the Flow: Visual Workspace for Chrome</title>
+  <meta name="description" content="Mind maps, flow charts, Kanban boards, Gantt charts, notebooks, to-dos, meeting prep, people notes, data tools and an optional link to your own AI app, in one window. 100% private, runs on your device.">
+  <link rel="icon" type="image/png" href="assets/icon-128.png">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0c0c12;
+      --card-bg: rgba(20, 20, 32, 0.65);
+      --card-border: rgba(167, 139, 250, 0.2);
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --cyan: #22d3ee;
+      --violet: #a78bfa;
+      --pink: #f472b6;
+      --amber: #fbbf24;
+      --emerald: #34d399;
+      --radius: 16px;
+      --max-w: 1180px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(ellipse at 50% -10%, rgba(167, 139, 250, 0.22), transparent 50%),
+        radial-gradient(circle at 5% 30%, rgba(34, 211, 238, 0.12), transparent 40%),
+        radial-gradient(circle at 95% 55%, rgba(244, 114, 182, 0.1), transparent 45%),
+        radial-gradient(ellipse at 50% 90%, rgba(34, 211, 238, 0.08), transparent 50%);
+      background-attachment: fixed;
+    }
+
+    .container { width: 100%; max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
+
+    header.site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(12, 12, 18, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      filter: drop-shadow(0 0 8px rgba(167, 139, 250, 0.5));
+    }
+
+    nav.nav-links { display: flex; align-items: center; gap: 24px; }
+
+    nav.nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+
+    nav.nav-links a:hover { color: var(--text); }
+
+    .nav-actions { display: flex; align-items: center; gap: 14px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 10px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #22d3ee, #a78bfa);
+      color: #0c0c12;
+      box-shadow: 0 4px 20px rgba(34, 211, 238, 0.35);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 26px rgba(34, 211, 238, 0.5);
+    }
+
+    .btn-glass {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      border-color: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(8px);
+    }
+
+    .btn-glass:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+    }
+
+    .btn-sm { padding: 8px 15px; font-size: 0.88rem; }
+
+    .btn-store {
+      font-size: 1.2rem; font-weight: 700; padding: 18px 36px; border-radius: 14px; gap: 12px;
+      background: linear-gradient(135deg, #22d3ee, #a78bfa 55%, #f472b6);
+      color: #0c0c12;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15) inset, 0 8px 34px rgba(167, 139, 250, 0.55), 0 0 60px rgba(34, 211, 238, 0.25);
+    }
+    .btn-store:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25) inset, 0 12px 44px rgba(167, 139, 250, 0.7), 0 0 80px rgba(34, 211, 238, 0.35); }
+    .btn-store svg { width: 24px; height: 24px; flex: none; }
+    .btn-store.btn-sm { font-size: 0.92rem; padding: 9px 16px; border-radius: 10px; gap: 8px; }
+    .btn-store.btn-sm svg { width: 17px; height: 17px; }
+    .store-note { margin-top: 12px; font-size: 0.88rem; color: var(--text-muted); }
+
+    .get-cta { text-align: center; padding: 64px 32px; border-radius: 24px; border: 1px solid rgba(167, 139, 250, 0.35);
+      background: radial-gradient(circle at 20% 0%, rgba(34, 211, 238, 0.16), transparent 55%), radial-gradient(circle at 85% 100%, rgba(244, 114, 182, 0.16), transparent 55%), rgba(255, 255, 255, 0.03); }
+    .get-cta h2 { font-size: clamp(1.9rem, 4vw, 2.8rem); font-weight: 800; letter-spacing: -0.02em; margin: 0 0 12px; color: #fff; }
+    .get-cta p { color: var(--text-muted); font-size: 1.1rem; margin: 0 auto 32px; max-width: 560px; }
+    @media (max-width: 600px) { .btn-store { width: 100%; padding: 16px 20px; font-size: 1.08rem; } .btn-store.btn-sm { width: auto; } }
+
+    .hero { padding: 76px 0 60px; text-align: center; }
+
+    .pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(167, 139, 250, 0.12);
+      border: 1px solid rgba(167, 139, 250, 0.35);
+      color: #d8b4fe;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      margin-bottom: 24px;
+      box-shadow: 0 0 16px -4px rgba(167, 139, 250, 0.4);
+    }
+
+    .hero-title {
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.035em;
+      margin-bottom: 22px;
+      max-width: 920px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-title .glow-cyan { color: var(--cyan); text-shadow: 0 0 30px rgba(34, 211, 238, 0.45); }
+    .hero-title .glow-pink { color: var(--pink); text-shadow: 0 0 30px rgba(244, 114, 182, 0.45); }
+
+    .hero-desc {
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+      color: var(--text-muted);
+      max-width: 740px;
+      margin: 0 auto 36px;
+      line-height: 1.6;
+    }
+
+    .hero-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+
+    .hero-visual {
+      position: relative;
+      margin: 0 auto;
+      border-radius: 20px;
+      padding: 10px;
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.35), rgba(167, 139, 250, 0.25) 45%, rgba(244, 114, 182, 0.3));
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 50px -10px rgba(34, 211, 238, 0.25);
+    }
+
+    .hero-visual img { width: 100%; height: auto; display: block; border-radius: 14px; background: #09090d; }
+
+    .section { padding: 90px 0; }
+    .section-head { text-align: center; max-width: 680px; margin: 0 auto 56px; }
+
+    .section-tag {
+      color: var(--cyan);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+
+    .section-title { font-size: clamp(1.9rem, 3.5vw, 2.6rem); font-weight: 700; letter-spacing: -0.025em; margin-bottom: 16px; }
+    .section-subtitle { color: var(--text-muted); font-size: 1.05rem; }
+
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      transition: all 0.25s ease;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(34, 211, 238, 0.4);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5), 0 0 25px -5px rgba(34, 211, 238, 0.2);
+    }
+
+    .feature-icon { font-size: 2rem; margin-bottom: 18px; display: inline-block; }
+    @media (min-width: 1060px) { .feature-wide { grid-column: span 2; } }
+    .feature-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 10px; color: #fff; }
+    .feature-text { color: var(--text-muted); font-size: 0.95rem; line-height: 1.55; }
+
+    .showcase-tabs { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 32px; }
+
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      padding: 10px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-btn:hover { color: var(--text); background: rgba(255, 255, 255, 0.08); }
+
+    .tab-btn.active {
+      color: #0c0c12;
+      background: var(--cyan);
+      border-color: var(--cyan);
+      box-shadow: 0 0 18px rgba(34, 211, 238, 0.45);
+    }
+
+    .skin-row { display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; margin: -14px 0 28px; }
+    .skin-label { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-right: 4px; }
+    .skin-chip {
+      display: inline-flex; align-items: center; gap: 9px; font-family: inherit; font-size: 0.9rem; font-weight: 600;
+      padding: 8px 16px 8px 9px; border-radius: 999px; cursor: pointer; color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); transition: all 0.2s ease;
+    }
+    .skin-chip:hover { color: var(--text); border-color: color-mix(in srgb, var(--sa) 60%, transparent); transform: translateY(-1px); }
+    .skin-chip.active { color: #fff; border-color: var(--sa); background: color-mix(in srgb, var(--sa) 16%, transparent); box-shadow: 0 0 18px color-mix(in srgb, var(--sa) 45%, transparent); }
+    .skin-chip:focus-visible { outline: 2px solid var(--sa); outline-offset: 2px; }
+    .skin-dot { width: 20px; height: 20px; border-radius: 50%; flex: none; background: linear-gradient(135deg, var(--sb) 0 50%, var(--sa) 50% 100%); box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35); }
+    .panel-img { transition: opacity 0.18s ease; }
+    .panel-img.swap { opacity: 0.15; }
+
+    .showcase-display {
+      background: var(--card-bg);
+      border: 1px solid var(--skin-accent, var(--card-border));
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 50px var(--skin-glow, transparent);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .panel-meta {
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .panel-title { font-size: 1.25rem; font-weight: 700; color: #fff; }
+    .panel-desc { color: var(--text-muted); font-size: 0.95rem; }
+    .panel-img { width: 100%; height: auto; display: block; }
+
+    .privacy-banner {
+      background: linear-gradient(135deg, rgba(22, 22, 38, 0.9), rgba(12, 12, 18, 0.95));
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      border-radius: var(--radius);
+      padding: 48px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 40px -15px rgba(52, 211, 153, 0.2);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 36px;
+      align-items: center;
+    }
+
+    @media (max-width: 768px) {
+      .privacy-banner { grid-template-columns: 1fr; padding: 32px 24px; text-align: center; }
+      .privacy-banner .btn { width: 100%; }
+      nav.nav-links { display: none; }
+    }
+
+    .privacy-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--emerald);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+
+    .privacy-title { font-size: 1.8rem; font-weight: 700; color: #fff; margin-bottom: 12px; letter-spacing: -0.02em; }
+    .privacy-text { color: #d1d5db; font-size: 1.05rem; line-height: 1.6; }
+
+    footer.site-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 60px 0 40px;
+      margin-top: 80px;
+      background: rgba(8, 8, 12, 0.9);
+    }
+
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; margin-bottom: 48px; }
+
+    @media (max-width: 768px) {
+      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+    }
+
+    .footer-brand { max-width: 360px; }
+    .footer-brand p { color: var(--text-muted); font-size: 0.9rem; margin-top: 14px; line-height: 1.6; }
+
+    .footer-col h4 { font-size: 0.95rem; font-weight: 600; color: #fff; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 10px; }
+
+    .footer-col a { color: var(--text-muted); text-decoration: none; font-size: 0.92rem; transition: color 0.15s; }
+    .footer-col a:hover { color: var(--cyan); }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container nav-inner">
+      <a href="./" class="brand">
+        <svg class="brand-logo" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="rgba(167, 139, 250, 0.18)" stroke-linecap="round" stroke-linejoin="round" d="M14.8 19.8H13.2V16.4C11.6 17.4 8.6 17.4 7 16.2 5.6 16 4.6 15 4.6 13.8 2.6 12.4 2.4 8 5 6.2 6.5 4 9.5 3.4 11.5 4C13.5 3 17 3.2 19 5.2C21.4 7 22.2 10.4 20.8 12.6 21.2 15.2 19.6 17.4 17.4 17.2 16.2 17.1 15.2 16.6 14.8 16V19.8Z"/>
+          <path fill="none" stroke="#22d3ee" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M14.8 19.8H13.2V16.4C11.6 17.4 8.6 17.4 7 16.2 5.6 16 4.6 15 4.6 13.8 2.6 12.4 2.4 8 5 6.2 6.5 4 9.5 3.4 11.5 4"/>
+          <path fill="none" stroke="#a78bfa" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M11.5 4C13.5 3 17 3.2 19 5.2"/>
+          <path fill="none" stroke="#f472b6" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M19 5.2C21.4 7 22.2 10.4 20.8 12.6 21.2 15.2 19.6 17.4 17.4 17.2 16.2 17.1 15.2 16.6 14.8 16V19.8"/>
+          <path fill="#fbbf24" stroke-linecap="round" stroke-linejoin="round" d="M8.6 7.4h1.8a1.5 1.5 0 1 1 2.4 0h1.8v1.8a1.5 1.5 0 1 1 0 2.4v1.8H8.6v-1.8a1.5 1.5 0 1 0 0-2.4z"/>
+        </svg>
+        <span>Mind the Flow</span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#views">Views</a>
+        <a href="#privacy">Privacy</a>
+        <a href="privacy/">Privacy Policy</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="https://chromewebstore.google.com/detail/mind-the-flow/gfciphihpoehgeaaegjojbafflagibbe" target="_blank" rel="noopener" class="btn btn-store btn-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg>Add to Chrome</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <div class="pill-badge">
+        <span>✨ 100% Private · Stored in Your Browser · Zero Cloud Telemetry</span>
+      </div>
+
+      <h1 class="hero-title">
+        The all-in-one visual workspace that lives in <span class="glow-cyan">one window</span>.
+      </h1>
+
+      <p class="hero-desc">
+        Mind maps and flow charts with glowing animated arrows, Kanban boards, Gantt charts, notebooks, to-dos, meeting prep, people notes and handy data tools, plus your own AI assistant if you want it. Completely local, blisteringly fast, and beautifully dark.
+      </p>
+
+      <div class="hero-buttons">
+        <a href="https://chromewebstore.google.com/detail/mind-the-flow/gfciphihpoehgeaaegjojbafflagibbe" target="_blank" rel="noopener" class="btn btn-store"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg>Add to Chrome, it's free</a>
+        <a href="privacy/" class="btn btn-glass">Read Privacy Policy</a>
+      </div>
+
+      <div class="hero-visual">
+        <img src="assets/marquee-1400x560.png" alt="Mind the Flow workspace overview" width="1400" height="560">
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">// ARCHITECTURE & PRINCIPLES</span>
+        <h2 class="section-title">Designed for focus, speed & absolute privacy</h2>
+        <p class="section-subtitle">
+          Everything runs in memory and saves to your local browser storage. No accounts, no subscriptions, and zero remote tracking.
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🛡️</div>
+          <h3 class="feature-title">Private by Design</h3>
+          <p class="feature-text">No accounts, no tracking cookies, and no servers. The developer never sees or stores anything you create.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3 class="feature-title">Instant & Offline-First</h3>
+          <p class="feature-text">Bundled completely inside the extension, fonts included. Opens in its own app window from the toolbar, works without internet, and never lags.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">✨</div>
+          <h3 class="feature-title">Neon Glass Aesthetic</h3>
+          <p class="feature-text">High-contrast dark mode with neon accents, animated Bézier flow arrows, subtle glassmorphism, and alternate Soft and Pink light themes.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🧠</div>
+          <h3 class="feature-title">Integrated Thinking</h3>
+          <p class="feature-text">Switch effortlessly between mind maps, Kanban, Gantt charts, rich notebooks, to-dos, meeting prep and people notes. Relate any item to any other, across every view, and keep every map, board, notebook and chart one click away in Collections.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📆</div>
+          <h3 class="feature-title">Unified Calendar & ToDay</h3>
+          <p class="feature-text">One shared calendar, in a window or full screen, surfaces every dated Kanban card, Gantt task, to-do, meeting, time off and holiday, and ToDay lists what is due today. Never lose track of deadlines across views.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💾</div>
+          <h3 class="feature-title">Portable File Control</h3>
+          <p class="feature-text">Single-click Save All writes your whole workspace to one JSON file, with automatic backups. Every view has its own Export: PNG images, standalone HTML, CSV, Markdown and JSON.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🧰</div>
+          <h3 class="feature-title">Built-in Data Tools</h3>
+          <p class="feature-text">JSON Fixer repairs broken JSON and marks every fix. CSV Fixer cleans spreadsheet exports and warns about Excel pitfalls. Base64 / URL encodes, decodes and reads JWTs. All on your device: nothing you paste is sent or saved.</p>
+        </div>
+        <div class="feature-card feature-wide">
+          <div class="feature-icon">🤖</div>
+          <h3 class="feature-title">Connect Your AI (optional)</h3>
+          <p class="feature-text">Let your own AI app (Claude Desktop, Claude Code or another MCP app) read, search, add and change your maps, cards, notes, to-dos, meetings and people. It talks only to a small helper on your own computer and stays off until you turn it on. Mark any item “AI hidden” to keep it away from the AI; every change can be undone and deleting always asks you first. Your AI app handles what it reads under its own privacy terms.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="views" style="background: rgba(0, 0, 0, 0.25);">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">// SEVEN CONNECTED WORKSPACES · FOUR SKINS</span>
+        <h2 class="section-title">Everything you need in a single window</h2>
+        <p class="section-subtitle">Click a workspace to explore it, then pick a skin to see it in another look. Every skin works in every view.</p>
+      </div>
+
+      <div class="showcase-tabs">
+        <button class="tab-btn active" data-tab="tab-map">🗺️ Mind Maps</button>
+        <button class="tab-btn" data-tab="tab-kanban">📋 Kanban Board</button>
+        <button class="tab-btn" data-tab="tab-gantt">📊 Gantt Charts</button>
+        <button class="tab-btn" data-tab="tab-notes">📓 Notebooks</button>
+        <button class="tab-btn" data-tab="tab-todo">✅ To-Do List</button>
+        <button class="tab-btn" data-tab="tab-meet">👥 Meeting Prep & Persons</button>
+      </div>
+
+      <div class="skin-row" role="group" aria-label="Skin">
+        <span class="skin-label">Skin</span>
+        <button type="button" class="skin-chip active" data-skin="classic" aria-pressed="true" title="Classic: black glass and neon" style="--sb: #050507; --sa: #22d3ee;"><span class="skin-dot" aria-hidden="true"></span>Classic</button>
+        <button type="button" class="skin-chip" data-skin="soft" aria-pressed="false" title="Soft: cream and soft beige" style="--sb: #f4ecdd; --sa: #4f8f8c;"><span class="skin-dot" aria-hidden="true"></span>Soft</button>
+        <button type="button" class="skin-chip" data-skin="pink" aria-pressed="false" title="Pink: blush and every shade of pink" style="--sb: #fdeef4; --sa: #e0428f;"><span class="skin-dot" aria-hidden="true"></span>Pink</button>
+        <button type="button" class="skin-chip" data-skin="moss" aria-pressed="false" title="Moss: deep moss and lichen green" style="--sb: #0f130d; --sa: #9cc46e;"><span class="skin-dot" aria-hidden="true"></span>Moss</button>
+      </div>
+
+      <div class="showcase-display">
+        <div class="tab-panel active" id="tab-map">
+          <div class="panel-meta">
+            <div>
+              <h3 class="panel-title">Mind Maps & Flow Charts</h3>
+              <p class="panel-desc">Drag-and-drop cards, glowing animated connections, customizable shapes, banner ribbons, and snap-to-grid.</p>
+            </div>
+            <span class="pill-badge" style="margin: 0;">Infinite Canvas</span>
+          </div>
+          <img class="panel-img" data-view="map" src="assets/shots/classic-map.webp" alt="Mind the Flow mind map workspace" width="1024" height="640">
+        </div>
+
+        <div class="tab-panel" id="tab-kanban">
+          <div class="panel-meta">
+            <div>
+              <h3 class="panel-title">Kanban Boards</h3>
+              <p class="panel-desc">Visual project tracking with custom columns, due dates, tags, color swatches, and browser reminders.</p>
+            </div>
+            <span class="pill-badge" style="margin: 0;">Multi-board support</span>
+          </div>
+          <img class="panel-img" data-view="kanban" src="assets/shots/classic-kanban.webp" alt="Mind the Flow Kanban board" width="1024" height="640">
+        </div>
+
+        <div class="tab-panel" id="tab-gantt">
+          <div class="panel-meta">
+            <div>
+              <h3 class="panel-title">Gantt Charts</h3>
+              <p class="panel-desc">Plan projects on a timeline: tasks, groups and milestones, drag bars to move or resize, link tasks so later ones shift automatically, working days that skip weekends and holidays, assignees from Persons, and progress.</p>
+            </div>
+            <span class="pill-badge" style="margin: 0;">Dependencies</span>
+          </div>
+          <img class="panel-img" data-view="gantt" src="assets/shots/classic-gantt.webp" alt="Mind the Flow Gantt chart" width="1024" height="640">
+        </div>
+
+        <div class="tab-panel" id="tab-notes">
+          <div class="panel-meta">
+            <div>
+              <h3 class="panel-title">Color-Coded Notebooks</h3>
+              <p class="panel-desc">Distraction-free Markdown writing organized in color-coded notebooks with live search and cross-linking.</p>
+            </div>
+            <span class="pill-badge" style="margin: 0;">Markdown Powered</span>
+          </div>
+          <img class="panel-img" data-view="notes" src="assets/shots/classic-notes.webp" alt="Mind the Flow Notebooks view" width="1024" height="640">
+        </div>
+
+        <div class="tab-panel" id="tab-todo">
+          <div class="panel-meta">
+            <div>
+              <h3 class="panel-title">To-Do List & Scheduling</h3>
+              <p class="panel-desc">Fast checklist management with recurring to-dos, sorting, folding, and one-click Google Calendar sync.</p>
+            </div>
+            <span class="pill-badge" style="margin: 0;">Recurring Tasks</span>
+          </div>
+          <img class="panel-img" data-view="todo" src="assets/shots/classic-todo.webp" alt="Mind the Flow To-Do list" width="1024" height="640">
+        </div>
+
+        <div class="tab-panel" id="tab-meet">
+          <div class="panel-meta">
+            <div>
+              <h3 class="panel-title">Meeting Prep & People Notes</h3>
+              <p class="panel-desc">Prepare agendas, link relevant cards and tasks, and keep track of colleagues' activity, time off, and relationships.</p>
+            </div>
+            <span class="pill-badge" style="margin: 0;">Relationship Map</span>
+          </div>
+          <img class="panel-img" data-view="meet" src="assets/shots/classic-meet.webp" alt="Mind the Flow Meeting Prep and Persons" width="1024" height="640">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="privacy">
+    <div class="container">
+      <div class="privacy-banner">
+        <div>
+          <div class="privacy-badge">🔒 Chrome Web Store Compliant</div>
+          <h2 class="privacy-title">Your privacy is not negotiable.</h2>
+          <p class="privacy-text">
+            Mind the Flow strictly adheres to the Chrome Web Store User Data Policy. We never collect, transmit, profile, or sell your data. No accounts required.
+          </p>
+        </div>
+        <div>
+          <a href="privacy/" class="btn btn-primary" style="background: var(--emerald); color: #0c0c12;">View Full Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="get">
+    <div class="container">
+      <div class="get-cta">
+        <h2>Ready to get into the flow?</h2>
+        <p>Install Mind the Flow from the Chrome Web Store. Free, no account, and everything stays on your device.</p>
+        <a href="https://chromewebstore.google.com/detail/mind-the-flow/gfciphihpoehgeaaegjojbafflagibbe" target="_blank" rel="noopener" class="btn btn-store"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M4 19h16"/></svg>Add to Chrome, it's free</a>
+        <div class="store-note">Opens the Chrome Web Store in a new tab</div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="./" class="brand">
+            <svg class="brand-logo" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="rgba(167, 139, 250, 0.18)" stroke-linecap="round" stroke-linejoin="round" d="M14.8 19.8H13.2V16.4C11.6 17.4 8.6 17.4 7 16.2 5.6 16 4.6 15 4.6 13.8 2.6 12.4 2.4 8 5 6.2 6.5 4 9.5 3.4 11.5 4C13.5 3 17 3.2 19 5.2C21.4 7 22.2 10.4 20.8 12.6 21.2 15.2 19.6 17.4 17.4 17.2 16.2 17.1 15.2 16.6 14.8 16V19.8Z"/>
+              <path fill="none" stroke="#22d3ee" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M14.8 19.8H13.2V16.4C11.6 17.4 8.6 17.4 7 16.2 5.6 16 4.6 15 4.6 13.8 2.6 12.4 2.4 8 5 6.2 6.5 4 9.5 3.4 11.5 4"/>
+              <path fill="none" stroke="#a78bfa" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M11.5 4C13.5 3 17 3.2 19 5.2"/>
+              <path fill="none" stroke="#f472b6" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M19 5.2C21.4 7 22.2 10.4 20.8 12.6 21.2 15.2 19.6 17.4 17.4 17.2 16.2 17.1 15.2 16.6 14.8 16V19.8"/>
+              <path fill="#fbbf24" stroke-linecap="round" stroke-linejoin="round" d="M8.6 7.4h1.8a1.5 1.5 0 1 1 2.4 0h1.8v1.8a1.5 1.5 0 1 1 0 2.4v1.8H8.6v-1.8a1.5 1.5 0 1 0 0-2.4z"/>
+            </svg>
+            <span>Mind the Flow</span>
+          </a>
+          <p>An offline visual thinking suite for mind maps, flow charts, Kanban boards, notebooks, to-dos, meeting prep and people notes.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#views">Workspaces</a></li>
+            <li><a href="privacy/">Privacy Policy</a></li>
+            <li><a href="feedback/">Send feedback</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal & Policies</h4>
+          <ul>
+            <li><a href="privacy/">Privacy Policy</a></li>
+            <li><a href="https://developer.chrome.com/docs/webstore/program-policies/user-data-faq" target="_blank" rel="noopener noreferrer">Chrome User Data FAQ</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div>© 2026 Mind the Flow. All rights reserved.</div>
+        <div>Built for speed, focus & privacy.</div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Skins: every view's screenshot follows the picked skin; the frame glows in its accent.
+    const SKIN_SHOTS = {"soft":{"map":"assets/shots/soft-map.webp","kanban":"assets/shots/soft-kanban.webp","gantt":"assets/shots/soft-gantt.webp","notes":"assets/shots/soft-notes.webp","todo":"assets/shots/soft-todo.webp","meet":"assets/shots/soft-meet.webp"},"pink":{"map":"assets/shots/pink-map.webp","kanban":"assets/shots/pink-kanban.webp","gantt":"assets/shots/pink-gantt.webp","notes":"assets/shots/pink-notes.webp","todo":"assets/shots/pink-todo.webp","meet":"assets/shots/pink-meet.webp"},"moss":{"map":"assets/shots/moss-map.webp","kanban":"assets/shots/moss-kanban.webp","gantt":"assets/shots/moss-gantt.webp","notes":"assets/shots/moss-notes.webp","todo":"assets/shots/moss-todo.webp","meet":"assets/shots/moss-meet.webp"}};
+    const CLASSIC = {};
+    document.querySelectorAll('.panel-img[data-view]').forEach(img => { CLASSIC[img.dataset.view] = img.src; });
+    const display = document.querySelector('.showcase-display');
+    document.querySelectorAll('.skin-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const skin = chip.dataset.skin, shots = skin === 'classic' ? CLASSIC : SKIN_SHOTS[skin];
+        if (!shots) return;
+        document.querySelectorAll('.skin-chip').forEach(c => { const on = c === chip; c.classList.toggle('active', on); c.setAttribute('aria-pressed', on); });
+        const accent = getComputedStyle(chip).getPropertyValue('--sa').trim();
+        display.style.setProperty('--skin-accent', skin === 'classic' ? '' : accent);
+        display.style.setProperty('--skin-glow', skin === 'classic' ? 'transparent' : 'color-mix(in srgb, ' + accent + ' 28%, transparent)');
+        document.querySelectorAll('.panel-img[data-view]').forEach(img => {
+          img.classList.add('swap');
+          setTimeout(() => { img.src = shots[img.dataset.view]; img.onload = () => img.classList.remove('swap'); }, 120);
+        });
+      });
+    });
+
+    document.querySelectorAll('.tab-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        const targetId = button.getAttribute('data-tab');
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+        const activePanel = document.getElementById(targetId);
+        if (activePanel) activePanel.classList.add('active');
+      });
+    });
+  </script>
+
+</body>
+</html>
