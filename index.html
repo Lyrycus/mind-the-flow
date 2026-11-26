@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mind the Flow: Visual Workspace for Chrome</title>
-  <meta name="description" content="Mind maps, flow charts, Kanban boards, Gantt charts, notebooks, to-dos, meeting prep, people notes, data tools and an optional link to your own AI app, in one window. 100% private, runs on your device.">
+  <meta name="description" content="Mind maps, flow charts, Kanban boards, Gantt charts, notebooks, to-dos, meeting prep, people notes, a Link Pocket for every web link, data tools and an optional link to your own AI app, in one window. 100% private, runs on your device.">
   <link rel="icon" type="image/png" href="assets/icon-128.png">
 
   <!-- Fonts -->
@@ -431,7 +431,7 @@
       </h1>
 
       <p class="hero-desc">
-        Mind maps and flow charts with glowing animated arrows, Kanban boards, Gantt charts, notebooks, to-dos, meeting prep, people notes and handy data tools, plus your own AI assistant if you want it. Completely local, blisteringly fast, and beautifully dark.
+        Mind maps and flow charts with glowing animated arrows, Kanban boards, Gantt charts, notebooks, to-dos, meeting prep, people notes, a Link Pocket for every web link and handy tools, plus your own AI assistant if you want it. Completely local, blisteringly fast, and beautifully dark.
       </p>
 
       <div class="hero-buttons">
@@ -469,12 +469,12 @@
         <div class="feature-card">
           <div class="feature-icon">✨</div>
           <h3 class="feature-title">Neon Glass Aesthetic</h3>
-          <p class="feature-text">High-contrast dark mode with neon accents, animated Bézier flow arrows, subtle glassmorphism, and alternate Soft and Pink light themes.</p>
+          <p class="feature-text">High-contrast dark mode with neon accents, animated Bézier flow arrows, subtle glassmorphism, plus three more skins: Soft and Pink light themes and the dark, earthy Moss.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">🧠</div>
           <h3 class="feature-title">Integrated Thinking</h3>
-          <p class="feature-text">Switch effortlessly between mind maps, Kanban, Gantt charts, rich notebooks, to-dos, meeting prep and people notes. Relate any item to any other, across every view, and keep every map, board, notebook and chart one click away in Collections.</p>
+          <p class="feature-text">Switch effortlessly between mind maps, Kanban, Gantt charts, rich notebooks, to-dos, meeting prep, people notes and the Link Pocket. Relate any item to any other, across every view, and keep every map, board, notebook and chart one click away in Collections.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">📆</div>
@@ -489,7 +489,7 @@
         <div class="feature-card">
           <div class="feature-icon">🧰</div>
           <h3 class="feature-title">Built-in Data Tools</h3>
-          <p class="feature-text">JSON Fixer repairs broken JSON and marks every fix. CSV Fixer cleans spreadsheet exports and warns about Excel pitfalls. Base64 / URL encodes, decodes and reads JWTs. All on your device: nothing you paste is sent or saved.</p>
+          <p class="feature-text">JSON Fixer repairs broken JSON and marks every fix. CSV Fixer cleans spreadsheet exports and warns about Excel pitfalls. Base64 / URL encodes, decodes and reads JWTs. QR Code turns a link or any text into a QR code to save as PNG or SVG. All on your device: nothing you paste is sent or saved.</p>
         </div>
         <div class="feature-card feature-wide">
           <div class="feature-icon">🤖</div>
@@ -503,7 +503,7 @@
   <section class="section" id="views" style="background: rgba(0, 0, 0, 0.25);">
     <div class="container">
       <div class="section-head">
-        <span class="section-tag">// SEVEN CONNECTED WORKSPACES · FOUR SKINS</span>
+        <span class="section-tag">// EIGHT CONNECTED WORKSPACES · FOUR SKINS</span>
         <h2 class="section-title">Everything you need in a single window</h2>
         <p class="section-subtitle">Click a workspace to explore it, then pick a skin to see it in another look. Every skin works in every view.</p>
       </div>
@@ -515,6 +515,7 @@
         <button class="tab-btn" data-tab="tab-notes">📓 Notebooks</button>
         <button class="tab-btn" data-tab="tab-todo">✅ To-Do List</button>
         <button class="tab-btn" data-tab="tab-meet">👥 Meeting Prep & Persons</button>
+        <button class="tab-btn" data-tab="tab-pocket">🔗 Link Pocket</button>
       </div>
 
       <div class="skin-row" role="group" aria-label="Skin">
@@ -563,7 +564,7 @@
           <div class="panel-meta">
             <div>
               <h3 class="panel-title">Color-Coded Notebooks</h3>
-              <p class="panel-desc">Distraction-free Markdown writing organized in color-coded notebooks with live search and cross-linking.</p>
+              <p class="panel-desc">Distraction-free Markdown writing organized in color-coded notebooks with live search and cross-linking. The notebook sidebar folds away when you want the whole width.</p>
             </div>
             <span class="pill-badge" style="margin: 0;">Markdown Powered</span>
           </div>
@@ -590,6 +591,17 @@
             <span class="pill-badge" style="margin: 0;">Relationship Map</span>
           </div>
           <img class="panel-img" data-view="meet" src="assets/shots/classic-meet.webp" alt="Mind the Flow Meeting Prep and Persons" width="1024" height="640">
+        </div>
+
+        <div class="tab-panel" id="tab-pocket">
+          <div class="panel-meta">
+            <div>
+              <h3 class="panel-title">Link Pocket</h3>
+              <p class="panel-desc">Every web link of your project in one table: names, notes and tags, and the cards that use each link. Links you add to any card join on their own, and changing or deleting one here updates every card. Paste a batch of addresses at once, sort and filter, and export to CSV or browser bookmarks.</p>
+            </div>
+            <span class="pill-badge" style="margin: 0;">New</span>
+          </div>
+          <img class="panel-img" data-view="pocket" src="assets/shots/classic-pocket.webp" alt="Mind the Flow Link Pocket" width="1024" height="640">
         </div>
       </div>
     </div>
@@ -665,7 +677,7 @@
 
   <script>
     // Skins: every view's screenshot follows the picked skin; the frame glows in its accent.
-    const SKIN_SHOTS = {"soft":{"map":"assets/shots/soft-map.webp","kanban":"assets/shots/soft-kanban.webp","gantt":"assets/shots/soft-gantt.webp","notes":"assets/shots/soft-notes.webp","todo":"assets/shots/soft-todo.webp","meet":"assets/shots/soft-meet.webp"},"pink":{"map":"assets/shots/pink-map.webp","kanban":"assets/shots/pink-kanban.webp","gantt":"assets/shots/pink-gantt.webp","notes":"assets/shots/pink-notes.webp","todo":"assets/shots/pink-todo.webp","meet":"assets/shots/pink-meet.webp"},"moss":{"map":"assets/shots/moss-map.webp","kanban":"assets/shots/moss-kanban.webp","gantt":"assets/shots/moss-gantt.webp","notes":"assets/shots/moss-notes.webp","todo":"assets/shots/moss-todo.webp","meet":"assets/shots/moss-meet.webp"}};
+    const SKIN_SHOTS = {"soft":{"map":"assets/shots/soft-map.webp","kanban":"assets/shots/soft-kanban.webp","gantt":"assets/shots/soft-gantt.webp","notes":"assets/shots/soft-notes.webp","todo":"assets/shots/soft-todo.webp","meet":"assets/shots/soft-meet.webp","pocket":"assets/shots/soft-pocket.webp"},"pink":{"map":"assets/shots/pink-map.webp","kanban":"assets/shots/pink-kanban.webp","gantt":"assets/shots/pink-gantt.webp","notes":"assets/shots/pink-notes.webp","todo":"assets/shots/pink-todo.webp","meet":"assets/shots/pink-meet.webp","pocket":"assets/shots/pink-pocket.webp"},"moss":{"map":"assets/shots/moss-map.webp","kanban":"assets/shots/moss-kanban.webp","gantt":"assets/shots/moss-gantt.webp","notes":"assets/shots/moss-notes.webp","todo":"assets/shots/moss-todo.webp","meet":"assets/shots/moss-meet.webp","pocket":"assets/shots/moss-pocket.webp"}};
     const CLASSIC = {};
     document.querySelectorAll('.panel-img[data-view]').forEach(img => { CLASSIC[img.dataset.view] = img.src; });
     const display = document.querySelector('.showcase-display');
